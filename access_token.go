@@ -1,7 +1,6 @@
 package dingtalk
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 )
@@ -16,8 +15,7 @@ var (
 
 type AccessTokenResp struct {
 	AccessToken string `json:"access_token"`
-	ErrCode     int    `json:"errcode"`
-	ErrMsg      string `json:"errmsg"`
+	BaseResponse
 }
 
 func (client *DTalkClient) GetAccessToken() (string, error) {
@@ -44,8 +42,9 @@ func (client *DTalkClient) RefreshAccessToken() error {
 	}
 
 	//赋值accesstoken
-	if at_resp.ErrCode != 0 || at_resp.ErrMsg != "ok" {
-		return errors.New("get accesstoken failed:" + at_resp.ErrMsg)
+	get_err = at_resp.CheckError()
+	if get_err != nil {
+		return get_err
 	} else {
 		client.accessToken = at_resp.AccessToken
 		return nil
