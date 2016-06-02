@@ -34,9 +34,9 @@ func TestClient(t *testing.T) {
 		t.Fatalf("get all department failed:%s", depart_err.Error())
 	}
 
-	department := departments.GetDepartByName("产品研发")
+	department := departments.GetDepartByName("仅供测试")
 	if department == nil {
-		t.Fatalf("now found the department \"产品研发\"!")
+		t.Fatalf("now found the department \"仅供测试\"!")
 	}
 
 	fmt.Printf("%v\n", department)
