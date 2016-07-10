@@ -6,7 +6,7 @@ import (
 )
 
 func TestClient(t *testing.T) {
-	client, client_err := NewDTalkClient(`ding52450ad5a38b178f`, `HAN6AFVmmgE-R9df-j0ITn00l7lFd84NCRVw5fO6T6hOct_myavo-_wmkMIpyzHj`)
+	client, client_err := NewDTalkClient(`ding52450ad5a38b178f`, ``)
 	if client_err != nil {
 		t.Fatalf("new client error:%s", client_err.Error())
 	}
