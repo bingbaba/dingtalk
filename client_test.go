@@ -2,11 +2,18 @@ package dingtalk
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
 func TestClient(t *testing.T) {
-	client, client_err := NewDTalkClient(`ding52450ad5a38b178f`, ``)
+	corpid := os.Getenv("DT_ID")
+	corpSecret := os.Getenv("DT_S")
+	if corpid == "" || corpSecret == "" {
+		return
+	}
+
+	client, client_err := NewDTalkClient(corpid, corpSecret)
 	if client_err != nil {
 		t.Fatalf("new client error:%s", client_err.Error())
 	}
