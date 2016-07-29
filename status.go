@@ -33,7 +33,7 @@ var (
 
 func InitNoticeConf(h, i, b, e, c int) *NoticeConf {
 	n := &NoticeConf{
-		hourPoint:   fmt.Sprintf("%2d:00", h),
+		hourPoint:   fmt.Sprintf("%02d:00", h),
 		intervalMin: int64(i*60 - 10),
 		exceptBegin: b,
 		exceptEnd:   e,
@@ -56,22 +56,25 @@ func (status *CheckStatus) Set2(failed bool, ctime int64) bool {
 }
 
 func (status *CheckStatus) Set(s string, ctime int64) bool {
-	curtime := time.Now().Unix()
 
 	//状态变化
 	if status.Status != s {
 		status.Tally = 1
-		status.StartTime = curtime
+		status.StartTime = ctime
 		status.Status = s
+		if s == "异常" || s == "F" || s == "E" {
+			status.AlarmTime = ctime
+		}
+
 		return true
 	} else {
 		status.Tally++
-		hour, _ := strconv.Atoi(time.Unix(curtime, 0).Format("15"))
+		hour, _ := strconv.Atoi(time.Unix(ctime, 0).Format("15"))
 
-		if time.Unix(curtime, 0).Format("15:04") == DefalutNoticeConf.hourPoint || //每天9点通告一次
+		if time.Unix(ctime, 0).Format("15:04") == DefalutNoticeConf.hourPoint || //每天9点通告一次
 			((s == "异常" || s == "F" || s == "E") &&
 				(status.Tally <= DefalutNoticeConf.continuous || //异常且告警不超过3次
-					(curtime-status.AlarmTime > DefalutNoticeConf.intervalMin &&
+					(ctime-status.AlarmTime > DefalutNoticeConf.intervalMin &&
 						(DefalutNoticeConf.zero && //跨越0点
 							hour >= DefalutNoticeConf.exceptEnd &&
 							hour <= DefalutNoticeConf.exceptBegin) ||
