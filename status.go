@@ -74,13 +74,15 @@ func (status *CheckStatus) Set(s string, ctime int64) bool {
 		if time.Unix(ctime, 0).Format("15:04") == DefalutNoticeConf.hourPoint || //每天9点通告一次
 			((s == "异常" || s == "F" || s == "E") &&
 				(status.Tally <= DefalutNoticeConf.continuous || //异常且告警不超过3次
-					(ctime-status.AlarmTime > DefalutNoticeConf.intervalMin &&
+					(ctime-status.AlarmTime > DefalutNoticeConf.intervalMin && //上次告警时间超过30分钟
 						(DefalutNoticeConf.zero && //跨越0点
 							hour >= DefalutNoticeConf.exceptEnd &&
 							hour <= DefalutNoticeConf.exceptBegin) ||
 						(!DefalutNoticeConf.zero && //不跨越0点
 							hour <= DefalutNoticeConf.exceptEnd &&
 							hour >= DefalutNoticeConf.exceptBegin)))) {
+
+			status.AlarmTime = ctime
 			return true
 		}
 	}
