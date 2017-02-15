@@ -1,6 +1,7 @@
 package dingtalk
 
 import (
+	"sync"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type DTalkClient struct {
 	CorpSecret   string
 	accessToken  string
 	getTokenTime int64
+	tokenM       sync.Mutex
 }
 
 func NewDTalkClient(corpid, corpSecret string) (*DTalkClient, error) {

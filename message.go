@@ -25,7 +25,7 @@ type MsgDetail_oa struct {
 }
 
 type MsgDetail_content_oa struct {
-	MsgUrl string `json:"message_url,omitempty"`
+	MsgUrl string `json:"message_url"`
 	Head   struct {
 		BgColor string `json:"bgcolor"`
 		Text    string `json:"text"`

@@ -2,15 +2,10 @@ package dingtalk
 
 import (
 	"fmt"
-	"sync"
 )
 
 const (
 	FMT_URL_GET_ACCESS_TOKEN = `https://oapi.dingtalk.com/gettoken?corpid=%s&corpsecret=%s`
-)
-
-var (
-	accees_mutex sync.Mutex
 )
 
 type AccessTokenResp struct {
@@ -19,11 +14,11 @@ type AccessTokenResp struct {
 }
 
 func (client *DTalkClient) GetAccessToken() (string, error) {
-	accees_mutex.Lock()
-	defer accees_mutex.Unlock()
+	client.tokenM.Lock()
+	defer client.tokenM.Unlock()
 
 	if client.accessToken == "" {
-		at_err := client.RefreshAccessToken()
+		at_err := client.refreshAccessToken()
 		if at_err != nil {
 			return "", at_err
 		}
@@ -32,6 +27,12 @@ func (client *DTalkClient) GetAccessToken() (string, error) {
 }
 
 func (client *DTalkClient) RefreshAccessToken() error {
+	client.tokenM.Lock()
+	defer client.tokenM.Unlock()
+	return client.refreshAccessToken()
+}
+
+func (client *DTalkClient) refreshAccessToken() error {
 	req_url := fmt.Sprintf(FMT_URL_GET_ACCESS_TOKEN, client.CorpID, client.CorpSecret)
 
 	//http Get
