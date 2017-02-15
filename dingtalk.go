@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+var (
+	OADefaultUrl = "http://www.baidu.com"
+)
+
 type MonitorMsg interface {
 	Exception() bool
 	GetID() string
@@ -45,7 +49,7 @@ func (m *DefaultMonitorMsg) GetContent() string {
 	return ""
 }
 func (m *DefaultMonitorMsg) GetStartTime() int64 {
-	return time.Now().Unix()
+	return 0
 }
 func (m *DefaultMonitorMsg) GetAuthor() string {
 	return ""
@@ -74,7 +78,13 @@ func NewDingtalkTool(conf *DingTalkConf) *DingtalkTool {
 
 func (dt *DingtalkTool) SendOA(msg MonitorMsg) error {
 	oamd := &MsgDetail_content_oa{}
-	oamd.MsgUrl = msg.GetUrl()
+
+	if msg.GetUrl() != "" {
+		oamd.MsgUrl = msg.GetUrl()
+	} else {
+		oamd.MsgUrl = OADefaultUrl
+	}
+
 	oamd.Head.Text = msg.GetName()
 	if msg.Exception() {
 		oamd.Body.Title = msg.GetName() + "异常"
@@ -85,9 +95,12 @@ func (dt *DingtalkTool) SendOA(msg MonitorMsg) error {
 		oamd.Body.Content = msg.GetContent()
 	}
 
-	form := append(msg.GetForm(), [2]string{
-		"开始时间：", time.Unix(msg.GetStartTime(), 0).Format("01/02 15:04"),
-	})
+	form := msg.GetForm()
+	if msg.GetStartTime() > 0 {
+		form = append(form, [2]string{
+			"开始时间：", time.Unix(msg.GetStartTime(), 0).Format("01/02 15:04"),
+		})
+	}
 	oamd.Body.Form = ParseForm(form)
 
 	oamd.Body.Rich.Num = msg.GetRichNum()

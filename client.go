@@ -23,7 +23,7 @@ func NewDTalkClient(corpid, corpSecret string) (*DTalkClient, error) {
 		CorpSecret: corpSecret,
 	}
 
-	_, err := client.GetAccessToken()
+	err := client.RefreshAccessToken()
 	if err != nil {
 		return nil, err
 	}
