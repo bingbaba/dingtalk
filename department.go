@@ -37,7 +37,6 @@ func (client *DTalkClient) GetAllDeparts() (Departments, error) {
 		return nil, get_err
 	}
 
-	//检查返回错误
 	get_err = resp.CheckError()
 	if get_err != nil {
 		return nil, errors.New(resp.ErrMsg)

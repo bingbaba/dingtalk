@@ -19,7 +19,25 @@ type UserResp struct {
 	UserList []*User `json:"userlist"`
 }
 
-func (client *DTalkClient) GetAlluser() ([]*User, error) {
+func (client *DTalkClient) GetAllUsers() ([]*User, error) {
+	users := make([]*User, 0)
+	depts, err := client.GetAllDeparts()
+	if err != nil {
+		return users, err
+	}
+
+	for _, dept := range depts {
+		tmp_users, err := client.GetDeptUsers(dept.ID)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, tmp_users...)
+	}
+
+	return users, nil
+}
+
+func (client *DTalkClient) GetDeptUsers(deptid int) ([]*User, error) {
 	access_token, at_err := client.GetAccessToken()
 	if at_err != nil {
 		return nil, at_err
@@ -27,14 +45,12 @@ func (client *DTalkClient) GetAlluser() ([]*User, error) {
 
 	resp := &UserResp{}
 
-	//获取 department_id = 1的所有员工
-	req_url := fmt.Sprintf(FMT_URL_GET_USERLIST, access_token, 1)
+	req_url := fmt.Sprintf(FMT_URL_GET_USERLIST, access_token, deptid)
 	get_err := HttpGetJson(req_url, resp)
 	if get_err != nil {
 		return nil, get_err
 	}
 
-	//检查返回错误
 	get_err = resp.CheckError()
 	if get_err != nil {
 		return nil, errors.New(resp.ErrMsg)
